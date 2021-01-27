@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, ActivityIndicator, View, ImageBackground, Text } from 'react-native';
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions'
 import { API_KEY } from './env/openWeather.js';
 import Day from './components/Day.js';
 import Time from './components/Time.js';
@@ -12,27 +14,34 @@ export default App = () => {
   const [currentWeather, setCurrentWeather] = useState(null);
 
   useEffect(() => {
-    getQuote();
+    findLocation();
   }, []);
 
   useEffect(() => {
-    getWeather();
+    getQuote();
   }, []);
+
+  const findLocation = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status === 'granted') {
+      let geolocation = await Location.getCurrentPositionAsync({});
+      getWeather(geolocation.coords.latitude, geolocation.coords.longitude);
+    }
+   };
+
+  const getWeather = async (lat = 0, lon = 0) => {
+    await fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${API_KEY}`)
+      .then((response) => response.json())
+      .then((json) => setCurrentWeather(json))
+      .catch((error) => console.error(error))
+      .then(() => setLoading(false));
+  };
 
   const getQuote = async () => {
     await fetch('https://quotes.rest/qod')
       .then((response) => response.json())
       .then((json) => setQuoteData(json.contents.quotes))
-      .catch((error) => console.error(error))
-      .then(() => setLoading(false));
-  };
-
-  const getWeather = async () => {
-    await fetch(`http://api.openweathermap.org/data/2.5/weather?q=oakland,ca,us&units=imperial&appid=${API_KEY}`)
-      .then((response) => response.json())
-      .then((json) => setCurrentWeather(json))
-      .catch((error) => console.error(error))
-      .then(() => setLoading(false));
+      .catch((error) => console.error(error));
   };
 
   return (
