@@ -1,5 +1,9 @@
 node_modules
 .expo
+.expo-shared
+assets
+app.json
+yarn.lock
 npm-debug.*
 *.jks
 *.p8
