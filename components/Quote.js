@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
 
-export default Quote = ({ data, style }) => (
-  <Text style={style}>"{data[0].quote}" - {data[0].author}</Text>
+export default Quote = ({ quoteData, style }) => (
+  <Text style={style}>"{quoteData[0].quote}" - {quoteData[0].author}</Text>
 );
